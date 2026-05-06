@@ -16,7 +16,13 @@ export function clearSession() {
 
 export function getUser() {
   const value = localStorage.getItem('user');
-  return value ? JSON.parse(value) : null;
+  try {
+    return value ? JSON.parse(value) : null;
+  } catch {
+    // Corrupted localStorage data — clear it
+    clearSession();
+    return null;
+  }
 }
 
 export async function api(path, options = {}) {
@@ -29,12 +35,24 @@ export async function api(path, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  let response;
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch (err) {
+    throw new Error('Network error — please check your connection and that the backend is running.');
+  }
 
   if (!response.ok) {
+    // Auto-logout on 401 (expired/invalid token) for non-auth endpoints
+    if (response.status === 401 && !path.startsWith('/api/auth/')) {
+      clearSession();
+      window.location.reload();
+      throw new Error('Session expired — please log in again.');
+    }
+
     let message = 'Something went wrong';
     try {
       const body = await response.json();
