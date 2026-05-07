@@ -51,6 +51,7 @@ public class SecurityConfig {
                 "http://localhost:5173",
                 "http://localhost:5174",
                 "http://127.0.0.1:5173",
+                "https://inquisitive-cat-369e38.netlify.app",
                 "https://agent-69fc1420850783b280--inquisitive-cat-369e38.netlify.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
