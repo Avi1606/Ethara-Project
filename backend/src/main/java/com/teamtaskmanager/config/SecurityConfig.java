@@ -42,8 +42,17 @@ public class SecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origin}") String allowedOrigin) {
+        // Strip trailing slash — origins must not end with /
+        String cleanOrigin = allowedOrigin.endsWith("/") ? allowedOrigin.substring(0, allowedOrigin.length() - 1) : allowedOrigin;
+
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(allowedOrigin, "http://localhost:5173", "http://127.0.0.1:5173"));
+        config.setAllowedOrigins(List.of(
+                cleanOrigin,
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "http://127.0.0.1:5173",
+                "https://agent-69fc1420850783b280--inquisitive-cat-369e38.netlify.app"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
